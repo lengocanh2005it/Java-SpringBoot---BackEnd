@@ -1,12 +1,24 @@
 package com.backend.JavaBackend.dto.request;
 
+import com.backend.JavaBackend.validation.ValidateFNameType;
+import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
 
 public class UserCreationRequest {
+    @Size(min = 3, message = "USERNAME_INVALID")
     private String username;
+
+    @Size(min = 8, message = "PASSWORD_INVALID")
     private String password;
+
+    // custom validator annotation
+    @ValidateFNameType
     private String firstName;
+
+    @NotBlank(message = "LAST_NAME_INVALID")
     private String lastName;
+
     private LocalDate birthday;
 
     public String getUsername() {
