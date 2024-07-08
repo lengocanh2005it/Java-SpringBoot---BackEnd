@@ -1,12 +1,12 @@
 package com.backend.JavaBackend.exception;
 
 import com.backend.JavaBackend.dto.response.ApiResponse;
-import com.nimbusds.jose.JOSEException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.text.ParseException;
 import java.util.*;
 
 @ControllerAdvice
@@ -30,8 +30,8 @@ public class GlobalExceptionHandler {
                 .build());
     }
 
-    @ExceptionHandler(value = JOSEException.class)
-    ResponseEntity<ApiResponse<String>> handleJOSEException(JOSEException joseException) {
+    @ExceptionHandler(value = ParseException.class)
+    ResponseEntity<ApiResponse<String>> handleJOSEException(ParseException joseException) {
         return ResponseEntity.badRequest().body(ApiResponse.<String>builder()
                         .statusCode(ErrorCode.TOKEN_INVALID.getStatusCode())
                         .message(ErrorCode.TOKEN_INVALID.getMessage())
