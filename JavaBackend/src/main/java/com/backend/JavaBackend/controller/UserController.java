@@ -24,31 +24,47 @@ public class UserController {
 
     @GetMapping
     public ApiResponse<List<UserResponse>> getUsers() {
-        return userService.getUsers();
+        return ApiResponse.<List<UserResponse>>builder()
+                .statusCode(200)
+                .message("Get users successfully.")
+                .data(userService.getUsers())
+                .build();
     }
 
     @GetMapping("/{userId}")
     public ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
-        return userService.getUser(userId);
+        return ApiResponse.<UserResponse>builder()
+                .statusCode(200)
+                .message("Get user successfully.")
+                .data(userService.getUser(userId))
+                .build();
     }
 
     @PostMapping("/create")
     public ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
-        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-        apiResponse.setData(userService.createUser(request));
-        apiResponse.setMessage("Create user successfully.");
-        return apiResponse;
+        return ApiResponse.<UserResponse>builder()
+                .data(userService.createUser(request))
+                .statusCode(200)
+                .message("Create user successfully.")
+                .build();
     }
 
     @PutMapping("/{userId}")
-    public ApiResponse<UserResponse> updateUser(@PathVariable("userId") String userId, @RequestBody UserUpdateRequest request){
-        return userService.updateUser(userId, request);
+    public ApiResponse<UserResponse>
+    updateUser(@PathVariable("userId") String userId, @RequestBody @Valid UserUpdateRequest request){
+        return ApiResponse.<UserResponse>builder()
+                .statusCode(200)
+                .message("Update user successfully.")
+                .data(userService.updateUser(userId, request))
+                .build();
     }
 
     @DeleteMapping("/{userId}")
     public ApiResponse<String> deleteUser(@PathVariable("userId") String userId) {
-        ApiResponse<String> apiResponse = new ApiResponse<>();
-        apiResponse.setMessage(userService.deleteUser(userId));
-        return apiResponse;
+        userService.deleteUser(userId);
+        return ApiResponse.<String>builder()
+                .message("User has been deleted.")
+                .statusCode(200)
+                .build();
     }
 }

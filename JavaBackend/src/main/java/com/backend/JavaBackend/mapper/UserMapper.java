@@ -5,7 +5,6 @@ import com.backend.JavaBackend.dto.request.UserUpdateRequest;
 import com.backend.JavaBackend.dto.response.UserResponse;
 import com.backend.JavaBackend.entity.User;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import java.util.*;
 
@@ -15,7 +14,7 @@ public interface UserMapper {
     User toUser(UserResponse response);
 
     //@Mapping(source = "firstName", target = "lastName")
-    @Mapping(target = "lastName", ignore = true)
+    //@Mapping(target = "lastName", ignore = true)
     UserResponse toUserResponse(User user);
     List<UserResponse> toUserResponseList(List<User> userList);
     void updateUser(@MappingTarget User user, UserUpdateRequest request);

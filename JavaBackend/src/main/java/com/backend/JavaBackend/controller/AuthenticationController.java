@@ -2,9 +2,12 @@ package com.backend.JavaBackend.controller;
 
 
 import com.backend.JavaBackend.dto.request.AuthenticationRequest;
+import com.backend.JavaBackend.dto.request.IntrospectRequest;
 import com.backend.JavaBackend.dto.response.ApiResponse;
 import com.backend.JavaBackend.dto.response.AuthenticationResponse;
+import com.backend.JavaBackend.dto.response.IntrospectResponse;
 import com.backend.JavaBackend.service.AuthenticationService;
+import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.ParseException;
 
 @Controller
 @RestController
@@ -24,22 +29,20 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        boolean authenticated = authenticationService.authenticate(request);
-        if (authenticated) {
-            return ApiResponse.<AuthenticationResponse>builder()
-                    .data(AuthenticationResponse.builder()
-                            .authenticated(true)
-                            .build())
-                    .statusCode(200)
-                    .message("Login successfully.")
-                    .build();
-        }
+        var result = authenticationService.authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
-                .data(AuthenticationResponse.builder()
-                        .authenticated(false)
-                        .build())
-                .statusCode(401)
-                .message("Login failed.")
+                .data(result)
+                .statusCode(200)
+                .build();
+    }
+
+    @PostMapping("/introspect")
+    ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request)
+            throws ParseException, JOSEException {
+        var data = authenticationService.introspect(request);
+        return ApiResponse.<IntrospectResponse>builder()
+                .data(data)
+                .statusCode(200)
                 .build();
     }
 }
