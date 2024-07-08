@@ -1,6 +1,6 @@
 package com.backend.JavaBackend.exception;
 
-import com.backend.JavaBackend.dto.request.ApiResponse;
+import com.backend.JavaBackend.dto.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;

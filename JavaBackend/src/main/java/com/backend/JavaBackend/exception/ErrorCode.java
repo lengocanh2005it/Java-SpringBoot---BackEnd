@@ -1,5 +1,8 @@
 package com.backend.JavaBackend.exception;
 
+import lombok.Getter;
+
+@Getter
 public enum ErrorCode {
     USER_EXISTED(409, "User has existed."),
     UNCATEGORIZED_EXCEPTION(999, "Uncategorized error."),
@@ -17,11 +20,4 @@ public enum ErrorCode {
         this.statusCode = statusCode;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public int getStatusCode() {
-        return statusCode;
-    }
 }
