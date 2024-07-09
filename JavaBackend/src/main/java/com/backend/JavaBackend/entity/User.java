@@ -3,7 +3,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDate;
+import java.time.*;
+import java.util.*;
 
 
 @Data
@@ -28,6 +29,9 @@ public class User {
 
     @Column
     String lastName;
+
+    @Column
+    Set<String> roles;
 
     @Column
     LocalDate birthday;

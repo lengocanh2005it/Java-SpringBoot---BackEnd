@@ -5,6 +5,7 @@ import com.backend.JavaBackend.dto.request.AuthenticationRequest;
 import com.backend.JavaBackend.dto.request.IntrospectRequest;
 import com.backend.JavaBackend.dto.response.AuthenticationResponse;
 import com.backend.JavaBackend.dto.response.IntrospectResponse;
+import com.backend.JavaBackend.entity.User;
 import com.backend.JavaBackend.exception.AppException;
 import com.backend.JavaBackend.exception.ErrorCode;
 import com.backend.JavaBackend.repository.UserRepository;
@@ -27,6 +28,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 @RequiredArgsConstructor
@@ -58,27 +60,28 @@ public class AuthenticationService {
         boolean authenticated = passwordEncoder.matches(request.getPassword(),
                 user.getPassword());
         if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
-        var token = generateToken(request.getUsername());
+
+        var token = generateToken(user);
         return AuthenticationResponse.builder()
                 .token(token)
                 .authenticated(true)
                 .build();
     }
 
-    private String generateToken(String username) {
+    private String generateToken(User user) {
         // create header
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
         // create payload
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username) // username
+                .subject(user.getUsername()) // username
                 .issuer("java.com") // from who
                 .issueTime(new Date()) // time create
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                         // expired after 1h
                 ))
-                .claim("customClaim", "Custom") // content of token
+                .claim("scope", buildScope(user)) // content of token
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject()); // create payload
         //
@@ -93,5 +96,13 @@ public class AuthenticationService {
             log.error("Can't not create token.");
             throw new RuntimeException(joseException);
         }
+    }
+
+    private String buildScope(User user) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if (!user.getRoles().isEmpty()) {
+            user.getRoles().forEach(stringJoiner::add);
+        }
+        return stringJoiner.toString();
     }
 }
