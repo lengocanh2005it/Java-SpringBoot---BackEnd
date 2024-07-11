@@ -31,7 +31,8 @@ public class User {
     String lastName;
 
     @Column
-    Set<String> roles;
+    @ManyToMany
+    Set<Role> roles;
 
     @Column
     LocalDate birthday;

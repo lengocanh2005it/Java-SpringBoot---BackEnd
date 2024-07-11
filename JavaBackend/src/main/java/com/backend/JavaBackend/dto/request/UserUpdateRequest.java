@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
@@ -21,6 +22,8 @@ public class UserUpdateRequest {
 
     @NotBlank(message = "LAST_NAME_INVALID")
     String lastName;
+
+    Set<String> roles;
 
     LocalDate birthday;
 }

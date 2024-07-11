@@ -1,8 +1,8 @@
 package com.backend.JavaBackend.configuration;
 
 
+import com.backend.JavaBackend.entity.Role;
 import com.backend.JavaBackend.entity.User;
-import com.backend.JavaBackend.enums.Role;
 import com.backend.JavaBackend.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
+import java.util.Set;
 
 @Configuration
 @RequiredArgsConstructor
@@ -26,8 +27,10 @@ public class ApplicationInitConfig {
     ApplicationRunner applicationRunner(UserRepository userRepository) {
         return args -> {
             if (userRepository.findByUsername("admin").isEmpty()) {
-                HashSet<String> roles = new HashSet<>();
-                roles.add(Role.ADMIN.name());
+                Set<Role> roles = new HashSet<>();
+                roles.add(Role.builder()
+                        .name("ADMIN")
+                        .build());
                 User user = User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))

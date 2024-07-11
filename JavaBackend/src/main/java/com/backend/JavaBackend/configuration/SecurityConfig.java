@@ -1,10 +1,11 @@
 package com.backend.JavaBackend.configuration;
 
-import com.backend.JavaBackend.enums.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,26 +22,31 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
     private final String[] publicEndpoints
-            = {"/users/create", "/auth/login", "/auth/introspect", "/users/my-info"};
+            = {"/users/create", "/auth/login", "/auth/introspect", "/users/my-info"
+              ,"/auth/logout"};
     private final String[] adminEndpoints
             = {"/users"};
 
     @Value("${jwt.signerKey}")
     private String signerKey;
 
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
+
     @Bean
     public DefaultSecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
                 request.requestMatchers(HttpMethod.POST, publicEndpoints).permitAll()
-                        .requestMatchers(HttpMethod.GET, adminEndpoints).hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
             oauth2.jwt(jwtConfigurer ->
-                    jwtConfigurer.decoder(jwtDecoder())
+                    jwtConfigurer.decoder(customJwtDecoder)
                             .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                    .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
         );
 
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
@@ -53,7 +59,7 @@ public class SecurityConfig {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter =
                 new JwtGrantedAuthoritiesConverter();
 
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
         JwtAuthenticationConverter jwtAuthenticationConverter =
                 new JwtAuthenticationConverter();
@@ -61,15 +67,6 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
 
         return jwtAuthenticationConverter;
-    }
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
     }
 
     @Bean

@@ -1,6 +1,6 @@
 package com.backend.JavaBackend.dto.request;
 
-import com.backend.JavaBackend.validation.ValidateFNameType;
+import com.backend.JavaBackend.validator.BirthdayConstraints;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,12 +18,13 @@ public class UserCreationRequest {
     @Size(min = 8, message = "PASSWORD_INVALID")
     String password;
 
-    // custom validator annotation
-    @ValidateFNameType
+    @NotBlank(message = "FIRST_NAME_INVALID")
     String firstName;
 
     @NotBlank(message = "LAST_NAME_INVALID")
     String lastName;
 
+    // custom validator annotation
+    @BirthdayConstraints(min = 18, message = "BIRTHDAY_INVALID")
     LocalDate birthday;
 }
